@@ -9,16 +9,26 @@ namespace Uppgift2_2SamuelAndreas.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly UserManager<IdentityUser> _userManager; // Inject UserManager
+        private readonly UserManager<ApplicationUser> _userManager; // Inject UserManager
 
-        public HomeController(UserManager<IdentityUser> userManager, ILogger<HomeController> logger)
+        public HomeController(UserManager<ApplicationUser> userManager, ILogger<HomeController> logger)
         {
             _logger = logger;
             _userManager = userManager;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user != null)
+
+                {
+                    ViewData["DisplayName"] = user.DisplayName;
+                }
+            }
+
             return View();
         }
 
@@ -43,15 +53,16 @@ namespace Uppgift2_2SamuelAndreas.Controllers
                 Email = user.Email,
                 Id = user.Id,
                 UserName = user.UserName,
+                DisplayName = user.DisplayName,
                 
-                PhoneNumber = user.PhoneNumber,
+                //PhoneNumber = user.PhoneNumber,
                 PasswordHash = user.PasswordHash,
                 TwoFactorEnabled = user.TwoFactorEnabled,
                 EmailConfirmed = user.EmailConfirmed,
 
 
         // Lägg till fler egenskaper efter behov, t.ex. namn, registreringsdatum osv.
-    };
+            };
 
             return View(profileViewModel);
         }
